@@ -1,65 +1,145 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Image from "next/image";
+import { fruitGrid } from "./data/fruits";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
+import clsx from "clsx";
+import Navabar from "@/components/Navbar";
+
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+
+const Home = () => {
+  useGSAP(() => {
+    ScrollSmoother.create({
+      wrapper: "#scroll-wrapper",
+      content: "#scroll-content",
+      smooth: 1.4,
+      smoothTouch: 0.1,
+      effects: true,
+      normalizeScroll: true,
+    });
+  });
+
+  useGSAP(() => {
+    const sections = gsap.utils.toArray(
+      ".grid-image-container",
+    ) as HTMLElement[];
+    sections.forEach((section) => {
+      const bg = section.querySelector(".grid-image");
+      const sectionHeight = section.offsetHeight / 50;
+
+      gsap.fromTo(
+        bg,
+        { yPercent: -sectionHeight },
+        {
+          yPercent: sectionHeight,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        },
+      );
+    });
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main id="scroll-wrapper">
+      <div
+        id="scroll-content"
+        style={{
+          backgroundImage: "url('/images/hero_1.png')",
+          backgroundSize: "1660px auto",
+          backgroundPosition: "top 50px right -450px",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <Navabar />
+        <section className="relative flex flex-col justify-between items-start gap-20 min-h-screen py-12 px-6">
+          <div className="absolute top-52 left-[10%] size-54 overflow-hidden rotate-65 -z-10">
+            <Image src="/images/leaft.png" alt="Banana" fill sizes="220px" />
+          </div>
+          <div>
+            <h1 className="text-9xl xl:text-[11.5cqw] font-bebasNeue text-secondary">
+              Is this a rotten fruit?
+            </h1>
+            <h2 className="text-8xl font-bebasNeue text-secondary">
+              UGhhh... it’s complicated...
+            </h2>
+          </div>
+
+          <div className="w-full max-w-3/12 space-y-8">
+            <p className="font-semibold text-xl">
+              Classification of fruit conditions based on visual analysis <br />
+              — without guesswork or hassle.
+            </p>
+            <button className="flex gap-4 items-center bg-accent rounded-full pl-2 p-1">
+              <span className="font-semibold text-2xl text-white">
+                Get Started
+              </span>
+              <span className="flex items-center justify-center bg-white size-12 rounded-full">
+                <Image
+                  src="/icons/banana-cta.svg"
+                  alt="Get Started"
+                  width={32}
+                  height={32}
+                />
+              </span>
+            </button>
+          </div>
+        </section>
+        <section className="space-y-6 px-6 mt-48">
+          <h1 className="font-bebasNeue text-4xl mb-6">fruit condition</h1>
+          <div className="grid grid-cols-12 gap-3">
+            {fruitGrid.map((item) => (
+              <div
+                key={item.id}
+                className={clsx(
+                  "col-span-4 relative min-h-[524px] flex items-center",
+                  {
+                    "grid-image-container overflow-hidden":
+                      item.type !== "content",
+                  },
+                )}
+              >
+                {item.type === "content" ? (
+                  <div className="relative flex flex-col gap-y-4 px-10">
+                    <h3 className="font-bold text-3xl">{item.title}</h3>
+                    <p className="text-xl">{item.description}</p>
+                    {item.icon &&
+                      item.icon.map((i) => (
+                        <Image
+                          key={i.name}
+                          src={i.src}
+                          alt={i.name}
+                          width={100}
+                          height={100}
+                          style={i.style}
+                          sizes="250px"
+                        />
+                      ))}
+                  </div>
+                ) : (
+                  <Image
+                    src={item?.image || ""}
+                    alt="fruit"
+                    fill
+                    className="grid-image object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
   );
-}
+};
+
+export default Home;
