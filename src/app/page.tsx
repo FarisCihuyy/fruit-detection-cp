@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import clsx from "clsx";
 import Navabar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -54,7 +55,7 @@ const Home = () => {
         id="scroll-content"
         style={{
           backgroundImage: "url('/images/hero_1.png')",
-          backgroundSize: "1660px auto",
+          backgroundSize: "clamp(760px, 120vw, 3000px) auto",
           backgroundPosition: "top 50px right -450px",
           backgroundRepeat: "no-repeat",
         }}
@@ -62,7 +63,7 @@ const Home = () => {
         <Navabar />
         <section className="relative flex flex-col justify-between items-start gap-20 min-h-screen py-12 px-6">
           <div className="absolute top-52 left-[10%] size-54 overflow-hidden rotate-65 -z-10">
-            <Image src="/images/leaft.png" alt="Banana" fill sizes="220px" />
+            <Image src="/images/leaft.png" alt="leaft" fill sizes="220px" />
           </div>
           <div>
             <h1 className="text-9xl xl:text-[11.5cqw] font-bebasNeue text-secondary">
@@ -100,7 +101,7 @@ const Home = () => {
               <div
                 key={item.id}
                 className={clsx(
-                  "col-span-4 relative min-h-[524px] flex items-center",
+                  "col-span-4 relative h-130 2xl:h-200 flex items-center",
                   {
                     "grid-image-container overflow-hidden":
                       item.type !== "content",
@@ -135,6 +136,32 @@ const Home = () => {
                 )}
               </div>
             ))}
+          </div>
+        </section>
+        <section className="mt-20 h-screen p-6">
+          <div className="bg-secondary rounded-4xl h-full flex items-center justify-center">
+            <div className="flex items-center justify-center flex-col gap-y-3 w-full max-w-2/3 text-foreground">
+              <h1 className="text-6xl font-semibold text-center">
+                Know your fruit before you eat it
+              </h1>
+              <p className="text-xl text-center">
+                Our AI checks color, texture, and damage to ensure your fruit is
+                truly fresh.
+              </p>
+              <Button className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80 rounded-full text-background text-2xl font-semibold">
+                <span className="font-semibold text-2xl text-white">
+                  Try It Free
+                </span>
+                <span className="flex items-center justify-center bg-white size-12 rounded-full">
+                  <Image
+                    src="/icons/banana-cta.svg"
+                    alt="Get Started"
+                    width={32}
+                    height={32}
+                  />
+                </span>{" "}
+              </Button>
+            </div>
           </div>
         </section>
       </div>

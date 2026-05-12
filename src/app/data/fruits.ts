@@ -21,7 +21,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-1.jpg",
+    image: "/images/fresh-orange.jpg",
     icon: null,
   },
   {
@@ -29,7 +29,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-2.jpg",
+    image: "/images/fresh-apple.jpg",
     icon: null,
   },
   {
@@ -73,7 +73,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-3.jpg",
+    image: "/images/fresh-banana.jpg",
     icon: null,
   },
   {
@@ -81,7 +81,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-4.jpg",
+    image: "/images/middle.jpg",
     icon: null,
   },
   {
@@ -89,7 +89,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-5.jpg",
+    image: "/images/rotten-banana.jpg",
     icon: null,
   },
   {
@@ -133,7 +133,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-6.jpg",
+    image: "/images/rotten-apple.jpg",
     icon: null,
   },
   {
@@ -141,7 +141,7 @@ export const fruitGrid: Fruit[] = [
     type: "placeholder",
     title: null,
     description: null,
-    image: "/images/fruit-7.jpg",
+    image: "/images/rotten-orange.jpg",
     icon: null,
   },
 ];
