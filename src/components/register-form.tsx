@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "@/services/auth.service";
+import { register } from "@/services/auth.service";
 import Link from "next/link";
 
 const schema = z.object({
+  name: z.string().min(3, "Please enter your name, at least 3 characters."),
   email: z
     .string()
     .min(1, "Email is required")
@@ -27,20 +28,21 @@ const schema = z.object({
 
 type Schema = z.infer<typeof schema>;
 
-export function LoginForm({
+export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
   const onSubmit = async (data: Schema) => {
-    const res = await login(data);
+    const res = await register(data);
     console.log(res);
   };
 
@@ -52,16 +54,32 @@ export function LoginForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-4xl font-bebasNeue">
-            welcome to
-            <span className="block text-secondary">Fresh or Trash</span>
-          </h1>
+          <h1 className="text-4xl font-bebasNeue">create your account</h1>
 
           <p className="text-sm text-balance text-muted-foreground">
-            Enter your email below to login to your account
+            Sign up using the form to create an account
           </p>
         </div>
 
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="name">Full Name</FieldLabel>
+
+              <Input
+                {...field}
+                id="name"
+                type="name"
+                placeholder="Enter your name"
+                aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
         <Controller
           name="email"
           control={form.control}
@@ -73,7 +91,7 @@ export function LoginForm({
                 {...field}
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="Enter your email"
                 aria-invalid={fieldState.invalid}
               />
 
@@ -87,21 +105,13 @@ export function LoginForm({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-
-                <a
-                  href="#"
-                  className="ml-auto text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
 
               <Input
                 {...field}
                 id="password"
                 type="password"
+                placeholder="********"
                 aria-invalid={fieldState.invalid}
               />
 
@@ -118,10 +128,10 @@ export function LoginForm({
             Login
           </Button>
           <span className="text-center mt-2 opacity-80 text-sm mx-auto">
-            Don't have an account?
-            <Link href="/register" className="text-indigo-600 hover:underline">
+            Already have an account?
+            <Link href="/login" className="text-indigo-600 hover:underline">
               {" "}
-              Signup
+              Login
             </Link>
           </span>
         </Field>

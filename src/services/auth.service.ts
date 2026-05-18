@@ -16,3 +16,22 @@ export const login = async (payload: any) => {
     console.log(error);
   }
 };
+
+export const register = async (payload: any) => {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  try {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
