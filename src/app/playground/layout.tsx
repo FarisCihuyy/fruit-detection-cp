@@ -1,7 +1,7 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+const PlaygroundLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider
       style={
@@ -18,4 +18,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
     </SidebarProvider>
   );
-}
+};
+
+export default PlaygroundLayout;
