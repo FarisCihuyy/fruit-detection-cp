@@ -63,7 +63,7 @@ const Home = () => {
             }}
             className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
           >
-            <span className="font-semibold text-background">Try It Free</span>
+            <span className="font-semibold text-background">Get Started</span>
             <span className="flex items-center justify-center bg-background size-12 rounded-full">
               <Image
                 src="/icons/banana-cta.svg"
@@ -137,7 +137,7 @@ const Home = () => {
               }}
               className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
             >
-              <span className="font-semibold text-background">Try It Free</span>
+              <span className="font-semibold text-background">Get Started</span>
               <span className="flex items-center justify-center bg-background size-12 rounded-full">
                 <Image
                   src="/icons/banana-cta.svg"
