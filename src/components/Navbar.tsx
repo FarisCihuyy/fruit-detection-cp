@@ -19,37 +19,41 @@ const Navabar = () => {
   const navbarRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (!navbarRef.current) return;
+    const mm = gsap.matchMedia();
 
-    gsap.fromTo(
-      navbarRef.current,
-      {
-        width: "100%",
-        padding: "0rem 0rem",
-        borderRadius: "0px",
-      },
-      {
-        width: "50%",
-        padding: "0.8rem 1rem",
-        borderRadius: "8px",
-        duration: 0.1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: navbarRef.current,
-          start: 0,
-          end: 120,
-          scrub: 1,
+    mm.add("(min-width: 768px)", () => {
+      if (!navbarRef.current) return;
+
+      gsap.fromTo(
+        navbarRef.current,
+        {
+          width: "100%",
+          padding: "0rem 0rem",
+          borderRadius: "0px",
         },
-      },
-    );
-  });
+        {
+          width: "50%",
+          padding: "0.8rem 1rem",
+          borderRadius: "8px",
+          duration: 0.1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: navbarRef.current,
+            start: 0,
+            end: 120,
+            scrub: 1,
+          },
+        },
+      );
 
-  useGSAP(() => {
-    ScrollTrigger.create({
-      start: 10,
-      onEnter: () => setScrolled(true),
-      onLeaveBack: () => setScrolled(false),
+      ScrollTrigger.create({
+        start: 10,
+        onEnter: () => setScrolled(true),
+        onLeaveBack: () => setScrolled(false),
+      });
     });
+
+    return () => mm.revert();
   });
 
   return (
@@ -65,7 +69,7 @@ const Navabar = () => {
             "px-4 py-4 flex md:hidden gap-x-3 items-center w-full absolute z-50",
             {
               "bg-transparent": isOpen,
-              "bg-background/10 backdrop-blur-sm shadow": !isOpen,
+              "bg-background/70 backdrop-blur-[150px] shadow": !isOpen,
             },
           )}
         >
@@ -123,12 +127,14 @@ const Navabar = () => {
             <Link
               href="/#how-it-work"
               className="transition-colors hover:text-accent hover:underline hover:font-medium"
+              onClick={() => setIsOpen(false)}
             >
               How it work?
             </Link>
             <Link
               href="/blog"
               className="transition-colors hover:text-accent hover:underline hover:font-medium"
+              onClick={() => setIsOpen(false)}
             >
               Blog
             </Link>
@@ -145,6 +151,7 @@ const Navabar = () => {
             <Link
               href="/about"
               className="transition-colors hover:text-accent hover:underline hover:font-medium"
+              onClick={() => setIsOpen(false)}
             >
               About
             </Link>
@@ -152,6 +159,7 @@ const Navabar = () => {
             <Link
               href={`${user ? "/playground" : "/login"}`}
               className="transition-colors hover:text-accent hover:underline hover:font-medium"
+              onClick={() => setIsOpen(false)}
             >
               Try now!
             </Link>

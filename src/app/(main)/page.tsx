@@ -6,8 +6,12 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/router";
 
 const Home = () => {
+  const { user } = useAuth();
+
   useGSAP(() => {
     const sections = gsap.utils.toArray(
       ".grid-image-container",
@@ -53,11 +57,14 @@ const Home = () => {
             Classification of fruit conditions based on visual analysis <br />—
             without guesswork or hassle.
           </p>
-          <button className="flex gap-4 items-center bg-accent rounded-full pl-2 p-1">
-            <span className="font-semibold text-2xl text-white">
-              Get Started
-            </span>
-            <span className="flex items-center justify-center bg-white size-12 rounded-full">
+          <Button
+            onClick={() => {
+              window.navigation.navigate(user ? "/playground" : "/login");
+            }}
+            className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
+          >
+            <span className="font-semibold text-background">Try It Free</span>
+            <span className="flex items-center justify-center bg-background size-12 rounded-full">
               <Image
                 src="/icons/banana-cta.svg"
                 alt="Get Started"
@@ -66,7 +73,7 @@ const Home = () => {
                 sizes=""
               />
             </span>
-          </button>
+          </Button>
         </div>
       </section>
       <section className="px-3 md:px-6 mt-40 md:mt-48">
@@ -113,24 +120,31 @@ const Home = () => {
           ))}
         </div>
       </section>
-      <section className="mt-12 md:mt-20 px-0 md:px-6">
-        <div className="bg-secondary py-12 px-4 md:px-0 md:py-16 md:rounded-4xl h-full flex items-center justify-center">
-          <div className="flex items-center justify-center flex-col gap-y-3 w-full md:max-w-2/3 text-foreground">
-            <h1 className="text-4xl md:text-6xl font-semibold text-center">
+      <section className="mt-12 h-[80svh]">
+        <div className="relative py-12 px-4 md:px-0 md:py-16 h-full flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 -z-10 blur-lg bg-[url(/images/bg-1.jpg)] bg-cover bg-top brightness-80" />
+          <div className="flex items-center justify-center flex-col gap-y-3 w-full md:max-w-2/3 text-background">
+            <h1 className="text-4xl md:text-6xl font-medium text-center">
               Know your fruit before you eat it
             </h1>
             <p className="text-base md:text-xl text-center">
               Our AI checks color, texture, and damage to ensure your fruit is
               truly fresh.
             </p>
-            <Button className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80 rounded-full text-background text-xl md:text-2xl font-semibold">
-              <span className="font-semibold text-white">Try It Free</span>
-              <span className="flex items-center justify-center bg-white size-12 rounded-full">
+            <Button
+              onClick={() => {
+                window.navigation.navigate(user ? "/playground" : "/login");
+              }}
+              className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
+            >
+              <span className="font-semibold text-background">Try It Free</span>
+              <span className="flex items-center justify-center bg-background size-12 rounded-full">
                 <Image
                   src="/icons/banana-cta.svg"
                   alt="Get Started"
                   width={32}
                   height={32}
+                  sizes=""
                 />
               </span>
             </Button>

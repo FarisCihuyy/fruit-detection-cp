@@ -3,10 +3,9 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navabar from "@/components/Navbar";
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(ScrollSmoother);
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   useGSAP(() => {
@@ -17,6 +16,7 @@ const ClientLayout = ({ children }: { children: React.ReactNode }) => {
       smoothTouch: 0.1,
       effects: true,
       normalizeScroll: true,
+      ignoreMobileResize: true,
     });
   });
 

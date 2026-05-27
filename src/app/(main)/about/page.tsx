@@ -102,44 +102,38 @@ const About = () => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const startDragging = (pageX: number) => {
     if (!sliderRef.current) return;
 
     setIsDragging(true);
 
-    setStartX(e.pageX - sliderRef.current.offsetLeft);
+    setStartX(pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
   };
 
-  const handleMouseUp = () => {
+  const stopDragging = () => {
     setIsDragging(false);
   };
 
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const moveDragging = (pageX: number) => {
     if (!isDragging || !sliderRef.current) return;
 
-    e.preventDefault();
-
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 0.8;
+    const x = pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
 
     sliderRef.current.scrollLeft = scrollLeft - walk;
   };
 
   return (
     <>
-      <section className="h-svh flex flex-col font-light px-6">
-        <div className="min-h-[80%] mx-auto flex flex-col justify-center w-fit uppercase text-6xl text-secondary leading-[0.9]">
+      <section className="h-svh flex flex-col font-light px-3 md:px-6">
+        <div className="min-h-[70%] md:min-h-[80%] mx-auto flex flex-col justify-center w-fit uppercase text-6xl text-secondary leading-[0.9]">
           <span>if other can</span>
           <span>do it, then good</span>
           <span>for them</span>
           <span className="text-right pr-12 italic">i quit</span>
         </div>
-        <p className="text-4xl">
+        <p className="text-3xl md:text-4xl">
           Seeing opportunities others miss. We exist to challenge the status quo
           and move things forward together.
         </p>
@@ -155,11 +149,17 @@ const About = () => {
           <div className="overflow-hidden">
             <div
               ref={sliderRef}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseLeave}
-              onMouseMove={handleMouseMove}
-              className="flex gap-x-4 overflow-x-auto px-20 touch-pan-x select-none cursor-grab snap-x snap-mandatory active:cursor-grabbing no-scrollbar"
+              onMouseDown={(e) => startDragging(e.pageX)}
+              onMouseMove={(e) => moveDragging(e.pageX)}
+              onMouseUp={stopDragging}
+              onMouseLeave={stopDragging}
+              onTouchStart={(e) => startDragging(e.touches[0].pageX)}
+              onTouchMove={(e) => moveDragging(e.touches[0].pageX)}
+              onTouchEnd={stopDragging}
+              className="flex gap-x-4 overflow-x-auto px-12 md:px-20 touch-pan-x select-none cursor-grab active:cursor-grabbing no-scrollbar"
+              style={{
+                WebkitOverflowScrolling: "touch",
+              }}
             >
               {philosophies.map((philosophy) => (
                 <div
@@ -186,15 +186,15 @@ const About = () => {
         </div>
       </section>
 
-      <section className="border-t border-t-primary/10 min-h-screen my-12">
-        <header className="grid grid-cols-2 p-6 items-baseline font-light">
+      <section className="border-t border-t-primary/10 min-h-screen my-12 px-3 md:px-6">
+        <header className="grid grid-cols-1 md:grid-cols-2 py-6 items-baseline font-light">
           <h2 className="text-2xl font-normal">Our Teams</h2>
           <p className="text-xl text-primary/80">
             Let&apos;s be friends so our LinkedIn homepages don&apos;t get
             boring. Connect!
           </p>
         </header>
-        <div className="grid grid-cols-4 gap-3 px-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-8">
           {teams.map((team) => (
             <div
               key={team.name}
