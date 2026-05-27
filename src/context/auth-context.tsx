@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type User = {
@@ -23,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = Cookies.get("user");
 
     if (storedUser) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -34,13 +35,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (userData: User) => {
-    localStorage.setItem("user", JSON.stringify(userData));
+    Cookies.set("user", JSON.stringify(userData), {
+      expires: 7,
+      path: "/",
+    });
+
+    Cookies.set("token", userData.token, {
+      expires: 7,
+      path: "/",
+    });
 
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    Cookies.remove("user");
+    Cookies.remove("token");
+
     setUser(null);
   };
 

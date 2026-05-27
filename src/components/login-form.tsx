@@ -11,15 +11,16 @@ import {
 import { Input } from "@/components/ui/input";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/services/auth.service";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLoading } from "@/context/loading-context";
+import { toast } from "sonner";
 
 const schema = z.object({
   email: z.email("Invalid email format"),
-
   password: z.string().min(1, "Password is required"),
 });
 
@@ -30,6 +31,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter();
+  const { setLoading } = useLoading();
   const { login: setUser } = useAuth();
 
   const form = useForm<Schema>({
@@ -41,13 +43,38 @@ export function LoginForm({
   });
 
   const onSubmit = async (data: Schema) => {
-    const res = await login(data);
+    setLoading(true);
 
-    if (!res) return;
+    try {
+      const res = await login(data);
 
-    setUser({ ...res.data, token: res.token });
+      setUser({
+        ...res.data,
+        token: res.token,
+      });
 
-    router.back();
+      toast.success(res.message ?? "Login success", {
+        style: {
+          background: "#198754",
+          color: "#fff",
+          border: "none",
+        },
+      });
+
+      router.back();
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message ?? "Login failed", {
+          style: {
+            background: "#DC3545",
+            color: "#fff",
+            border: "none",
+          },
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,21 +120,12 @@ export function LoginForm({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-
-                <a
-                  href="#"
-                  className="ml-auto text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 {...field}
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 aria-invalid={fieldState.invalid}
               />
 

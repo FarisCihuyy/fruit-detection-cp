@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login, register } from "@/services/auth.service";
+import { register } from "@/services/auth.service";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { useLoading } from "@/context/loading-context";
 
 const schema = z.object({
   name: z.string().min(3, "Please enter your name, at least 3 characters."),
@@ -35,7 +36,7 @@ export function RegisterForm({
   ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter();
-  const { login: setUser } = useAuth();
+  const { setLoading } = useLoading();
 
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
@@ -47,23 +48,34 @@ export function RegisterForm({
   });
 
   const onSubmit = async (data: Schema) => {
-    const res = await register(data);
+    if (!data) return;
+    setLoading(true);
 
-    if (!res) return;
+    try {
+      const res = await register(data);
 
-    const user = await login({
-      email: data.email,
-      password: data.password,
-    });
+      toast.success(res.message ?? "Register success, please login", {
+        style: {
+          background: "#198754",
+          color: "#fff",
+          border: "none",
+        },
+      });
 
-    if (!user) {
-      console.log("gagal login");
-      return;
+      router.push("/login");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message ?? "Login failed", {
+          style: {
+            background: "#DC3545",
+            color: "#fff",
+            border: "none",
+          },
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setUser({ ...user.data, token: user.token });
-
-    router.back();
   };
 
   return (
