@@ -9,18 +9,16 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/services/auth.service";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 const schema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format"),
+  email: z.email("Invalid email format"),
 
   password: z.string().min(1, "Password is required"),
 });
@@ -31,6 +29,9 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const router = useRouter();
+  const { login: setUser } = useAuth();
+
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -41,7 +42,12 @@ export function LoginForm({
 
   const onSubmit = async (data: Schema) => {
     const res = await login(data);
-    console.log(res);
+
+    if (!res) return;
+
+    setUser({ ...res.data, token: res.token });
+
+    router.back();
   };
 
   return (
@@ -118,7 +124,7 @@ export function LoginForm({
             Login
           </Button>
           <span className="text-center mt-2 opacity-80 text-sm mx-auto">
-            Don't have an account?
+            Don&apos;t have an account?
             <Link href="/register" className="text-indigo-600 hover:underline">
               {" "}
               Signup

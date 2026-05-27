@@ -13,8 +13,10 @@ import { Input } from "@/components/ui/input";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { register } from "@/services/auth.service";
+import { login, register } from "@/services/auth.service";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 const schema = z.object({
   name: z.string().min(3, "Please enter your name, at least 3 characters."),
@@ -32,6 +34,9 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const router = useRouter();
+  const { login: setUser } = useAuth();
+
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -43,7 +48,22 @@ export function RegisterForm({
 
   const onSubmit = async (data: Schema) => {
     const res = await register(data);
-    console.log(res);
+
+    if (!res) return;
+
+    const user = await login({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (!user) {
+      console.log("gagal login");
+      return;
+    }
+
+    setUser({ ...user.data, token: user.token });
+
+    router.back();
   };
 
   return (
@@ -125,7 +145,7 @@ export function RegisterForm({
             type="submit"
             className="bg-accent hover:bg-accent/80 cursor-pointer text-background rounded-sm font-semibold"
           >
-            Login
+            Register
           </Button>
           <span className="text-center mt-2 opacity-80 text-sm mx-auto">
             Already have an account?

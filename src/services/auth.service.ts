@@ -1,4 +1,10 @@
-export const login = async (payload: any) => {
+interface Payload {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+export const login = async (payload: Payload) => {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   try {
@@ -17,7 +23,7 @@ export const login = async (payload: any) => {
   }
 };
 
-export const register = async (payload: any) => {
+export const register = async (payload: Payload) => {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   try {

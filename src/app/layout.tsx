@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Archivo } from "next/font/google";
 import "./globals.css";
+import AppProvider from "@/providers/app-provider";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -10,7 +11,7 @@ const bebasNeue = Bebas_Neue({
 
 const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "800"],
+  weight: ["300", "400", "500", "600", "800"],
   variable: "--font-archivo",
 });
 
@@ -29,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${archivo.variable} ${bebasNeue.variable} font-archivo text-primary bg-background overflow-x-hidden min-h-screen antialiased`}
       >
-        {children}
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );
