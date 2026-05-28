@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Archivo } from "next/font/google";
+import { Bebas_Neue, Archivo, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import AppProvider from "@/providers/app-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,6 +12,12 @@ const bebasNeue = Bebas_Neue({
   variable: "--font-bebasNeue",
 });
 
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-sourceSerif",
+  weight: ["300", "400", "500", "600"],
+});
+
 const archivo = Archivo({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "800"],
@@ -19,7 +25,7 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  title: "Fresh or Rotten",
+  title: "Fresh or Trash",
   description: "Fruit classifier",
 };
 
@@ -31,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${archivo.variable} ${bebasNeue.variable} font-archivo text-primary bg-background overflow-x-hidden min-h-screen antialiased`}
+        className={`${archivo.variable} ${bebasNeue.variable} ${sourceSerif.variable} font-archivo text-primary bg-background overflow-x-hidden min-h-screen antialiased`}
       >
         <AppProvider>
           <LoadingProvider>
