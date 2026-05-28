@@ -54,7 +54,7 @@ export function RegisterForm({
     try {
       const res = await register(data);
 
-      toast.success(res.message ?? "Register success, please login", {
+      toast.success(res?.message ?? "Register success, please login", {
         style: {
           background: "#198754",
           color: "#fff",

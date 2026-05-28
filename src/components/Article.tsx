@@ -1,11 +1,16 @@
+"use client";
+
 import { Articles } from "@/services/types/article";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { formatDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const Article = ({ data }: { data: Articles["data"] }) => {
+  const router = useRouter();
+
   return (
     <article className="relative flex justify-center items-center py-8 md:py-16">
       <h2 className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2">
@@ -39,9 +44,7 @@ const Article = ({ data }: { data: Articles["data"] }) => {
           <Button
             className="rounded-sm w-fit text-background"
             variant="secondary"
-            onClick={() =>
-              (window.location.href = `/blog/${data.id}/${data.slug}`)
-            }
+            onClick={() => router.push(`/blog/${data.id}/${data.slug}`)}
           >
             Read More
             <ArrowUpRight />

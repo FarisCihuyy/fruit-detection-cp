@@ -15,13 +15,15 @@ import { login } from "@/services/auth.service";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoading } from "@/context/loading-context";
 import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
-  email: z.email("Invalid email format"),
-  password: z.string().min(1, "Password is required"),
+  email: z
+    .string()
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
+  password: z.string(),
 });
 
 type Schema = z.infer<typeof schema>;

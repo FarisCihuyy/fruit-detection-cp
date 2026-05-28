@@ -7,10 +7,11 @@ import { useGSAP } from "@gsap/react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const { user } = useAuth();
+  const router = useRouter();
 
   useGSAP(() => {
     const sections = gsap.utils.toArray(
@@ -59,7 +60,7 @@ const Home = () => {
           </p>
           <Button
             onClick={() => {
-              window.navigation.navigate(user ? "/playground" : "/login");
+              router.push(user ? "/playground" : "/login");
             }}
             className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
           >
@@ -133,7 +134,7 @@ const Home = () => {
             </p>
             <Button
               onClick={() => {
-                window.navigation.navigate(user ? "/playground" : "/login");
+                router.push(user ? "/playground" : "/login");
               }}
               className="mt-8 h-14 p-1 pl-2 bg-accent hover:bg-accent/80  rounded-full text-background text-xl md:text-2xl font-semibold cursor-pointer"
             >
