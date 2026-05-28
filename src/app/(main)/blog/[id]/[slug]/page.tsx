@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { article } from "@/services/article.service";
 import { Articles } from "@/services/types/article";
@@ -16,12 +17,11 @@ export default async function Page({ params }: Props) {
 
   const response = await article.getById(id);
 
-  if (!response.data) return new Response(null, { status: 404 });
+  if (!response.data) notFound();
 
   const blog: Articles["data"] = response.data;
 
-  if (slug !== blog?.slug) return new Response(null, { status: 404 });
-
+  if (slug !== blog?.slug) notFound();
   return (
     <main className="space-y-12 md:mt-8 min-h-screen md:max-w-lg lg:max-w-xl mx-auto">
       <section className="space-y-1">
