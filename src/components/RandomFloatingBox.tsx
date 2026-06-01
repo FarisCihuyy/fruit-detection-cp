@@ -46,7 +46,7 @@ export default function RandomFloatingBox() {
   return (
     <div
       ref={boxRef}
-      className="absolute inset-0 -z-10 size-200 blur-[350px] rounded-full bg-accent/30 pointer-events-none"
+      className="absolute inset-0 -z-10 size-200 blur-[350px] rounded-full bg-accent/20 pointer-events-none"
     />
   );
 }

@@ -8,7 +8,7 @@ export default function Page() {
       <FileDropzone
         accept="image/*"
         multiple={false}
-        maxSizeMB={10}
+        maxSizeMB={3}
         onFilesChange={(files) => console.log(files)}
       />
     </div>

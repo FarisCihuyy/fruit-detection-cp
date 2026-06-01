@@ -1,17 +1,22 @@
 "use client";
 
 import Article from "@/components/Article";
+import ArticleSkeleton from "@/components/ArticleSkeleton";
 import { article } from "@/services/article.service";
 import { Articles } from "@/services/types/article";
 import { useEffect, useState } from "react";
 
 const Blog = () => {
   const [blog, setBlog] = useState<Articles["data"][]>([]);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     async function getBlog() {
       const response = await article.getAll();
       setBlog(response.data);
+      if (response.data.length === 0) {
+        setNoData(true);
+      }
     }
     getBlog();
   }, []);
@@ -39,6 +44,14 @@ const Blog = () => {
       {blog.length > 0 ? (
         blog.map((data) => <Article key={data.id} data={data} />)
       ) : (
+        <>
+          {[...Array(3)].map((_, i) => (
+            <ArticleSkeleton key={i} />
+          ))}
+        </>
+      )}
+
+      {noData && (
         <div className="min-h-66 flex items-center justify-center">
           <span className="text-xl font-light">No data</span>
         </div>

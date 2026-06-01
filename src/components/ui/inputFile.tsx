@@ -1,161 +1,212 @@
 "use client";
 
 import { Upload } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
+import { Button } from "./button";
 
-// ✅ Tidak ada lagi import TensorFlow — semua prediksi lewat API
-
-interface BoundingBox {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+interface FruitDetection {
+  id: number;
+  class: string;
+  condition: string;
+  segar_confidence: number;
+  busuk_confidence: number;
+  box: [number, number, number, number];
+  is_fallback: boolean;
 }
 
 interface PredictionResult {
-  label: string;
-  class: string;
-  confidence: number;
-  processing_time_ms: number;
-  boundingBox: BoundingBox;
-  allProbabilities: { name: string; confidence: number }[];
+  fruits_detected: FruitDetection[];
+  processing_time_ms?: number;
 }
 
 interface FileDropzoneProps {
   accept?: string;
   multiple?: boolean;
   maxSizeMB?: number;
-  apiUrl?: string; // ← URL API, default: http://localhost:3001/api/predict
-  onFilesChange?: (files: File[]) => void;
+  apiUrl?: string;
+  onFilesChange?: (file: File | null) => void;
 }
 
 export default function FileDropzone({
   accept = "image/*",
   multiple = false,
-  maxSizeMB = 10,
-  apiUrl = "http://localhost:3001/api/predict",
+  maxSizeMB = 5,
+  apiUrl = process.env.NEXT_PUBLIC_BASE_URL as string,
   onFilesChange,
 }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [predictions, setPredictions] = useState<{
-    [key: number]: PredictionResult | null;
-  }>({});
-  const [isPredicting, setIsPredicting] = useState<{ [key: number]: boolean }>(
-    {},
-  );
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [predictedImage, setPredictedImage] = useState<string | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ─── Fungsi Hit API ────────────────────────────────────────────
+  const drawBoundingBoxes = useCallback(
+    (imageUrl: string, detections: FruitDetection[]): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.crossOrigin = "anonymous";
+
+        img.onload = () => {
+          try {
+            // Create a new canvas element
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              reject(new Error("Could not get canvas context"));
+              return;
+            }
+
+            // Draw the image
+            ctx.drawImage(img, 0, 0);
+
+            // Draw bounding boxes
+            const colors = [
+              "#FF6B6B",
+              "#4ECDC4",
+              "#45B7D1",
+              "#FFA07A",
+              "#98D8C8",
+            ];
+
+            detections.forEach((detection, index) => {
+              const [ymin, xmin, ymax, xmax] = detection.box;
+              const width = xmax - xmin;
+              const height = ymax - ymin;
+
+              // Draw rectangle
+              ctx.strokeStyle = colors[index % colors.length];
+              ctx.lineWidth = 3;
+              ctx.strokeRect(xmin, ymin, width, height);
+
+              // Draw label background
+              const label = `${detection.class} - ${detection.condition}`;
+              const confidence =
+                Math.max(
+                  detection.segar_confidence,
+                  detection.busuk_confidence,
+                ) * 100;
+              const text = `${label} (${confidence.toFixed(1)}%)`;
+
+              ctx.font = "bold 14px Arial";
+              ctx.fillStyle = colors[index % colors.length];
+              const textWidth = ctx.measureText(text).width;
+              ctx.fillRect(xmin, ymin - 28, textWidth + 10, 28);
+
+              // Draw text
+              ctx.fillStyle = "#FFF";
+              ctx.fillText(text, xmin + 5, ymin - 10);
+            });
+
+            const dataUrl = canvas.toDataURL("image/png");
+            resolve(dataUrl);
+          } catch (err) {
+            reject(err);
+          }
+        };
+
+        img.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+
+        img.src = imageUrl;
+      });
+    },
+    [],
+  );
+
   const predictImage = useCallback(
-    async (file: File, index: number) => {
-      setIsPredicting((prev) => ({ ...prev, [index]: true }));
+    async (imageFile: File, previewUrl: string) => {
+      setIsPredicting(true);
 
       try {
         const formData = new FormData();
-        formData.append("image", file);
+        formData.append("image", imageFile);
 
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${apiUrl}/predict`, {
           method: "POST",
           body: formData,
         });
 
         if (!response.ok) {
-          const errBody = await response.json().catch(() => ({}));
-          throw new Error(errBody.error || `HTTP ${response.status}`);
+          throw new Error(`HTTP ${response.status}`);
         }
 
-        const { data } = await response.json();
+        const data = (await response.json()) as PredictionResult;
 
-        setPredictions((prev) => ({
-          ...prev,
-          [index]: {
-            label: data.kondisi,
-            class: data.buah,
-            confidence: data.confidence,
-            processing_time_ms: data.processing_time_ms,
-            boundingBox: {
-              x: data.bounding_box.x_min_pct,
-              y: data.bounding_box.y_min_pct,
-              width: data.bounding_box.width_pct,
-              height: data.bounding_box.height_pct,
-            },
-            allProbabilities: data.all_probabilities.map(
-              (p: { class: string; confidence: number }) => ({
-                name: p.class,
-                confidence: p.confidence,
-              }),
-            ),
-          },
-        }));
+        setPrediction(data);
+
+        if (data.fruits_detected && data.fruits_detected.length > 0) {
+          try {
+            const imageWithBoxes = await drawBoundingBoxes(
+              previewUrl,
+              data.fruits_detected,
+            );
+            setPredictedImage(imageWithBoxes);
+          } catch (err) {
+            console.error("Error drawing bounding boxes:", err);
+            setError("Failed to draw bounding boxes on image");
+          }
+        }
       } catch (err) {
         setError(
           `Prediksi gagal: ${err instanceof Error ? err.message : String(err)}`,
         );
       } finally {
-        setIsPredicting((prev) => ({ ...prev, [index]: false }));
+        setIsPredicting(false);
       }
     },
-    [apiUrl],
+    [apiUrl, drawBoundingBoxes],
   );
 
-  // ─── File Handling ─────────────────────────────────────────────
-  const validateAndSetFiles = useCallback(
+  const validateAndSetFile = useCallback(
     (incoming: FileList | File[]) => {
       setError(null);
       const arr = Array.from(incoming);
 
-      const oversized = arr.filter((f) => f.size > maxSizeMB * 1024 * 1024);
-      if (oversized.length) {
-        setError(
-          `File${oversized.length > 1 ? "s" : ""} exceed ${maxSizeMB} MB limit.`,
-        );
+      if (arr.length === 0) return;
+
+      const selectedFile = arr[0];
+
+      if (selectedFile.size > maxSizeMB * 1024 * 1024) {
+        setError(`File exceeds ${maxSizeMB} MB limit.`);
         return;
       }
 
-      const selected = multiple ? arr : [arr[0]];
-      setFiles(selected);
-      onFilesChange?.(selected);
-      setPredictions({});
-      setIsPredicting({});
+      setFile(selectedFile);
+      onFilesChange?.(selectedFile);
+      setPrediction(null);
+      setPredictedImage(null);
+      setIsPredicting(false);
 
-      const newPreviews: string[] = [];
-      let loaded = 0;
-
-      selected.forEach((file, index) => {
-        if (file.type.startsWith("image/")) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            newPreviews[index] = e.target?.result as string;
-            loaded++;
-            if (loaded === selected.length) {
-              setPreviews([...newPreviews]);
-              // ✅ Kirim File langsung ke API, tidak perlu konversi base64
-              selected.forEach((f, idx) => predictImage(f, idx));
-            }
-          };
-          reader.readAsDataURL(file);
-        } else {
-          newPreviews[index] = "";
-          loaded++;
-          if (loaded === selected.length) setPreviews([...newPreviews]);
-        }
-      });
+      if (selectedFile.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const previewUrl = e.target?.result as string;
+          setPreview(previewUrl);
+          predictImage(selectedFile, previewUrl);
+        };
+        reader.readAsDataURL(selectedFile);
+      } else {
+        setPreview(null);
+      }
     },
-    [maxSizeMB, multiple, onFilesChange, predictImage],
+    [maxSizeMB, onFilesChange, predictImage],
   );
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       setIsDragging(false);
-      if (e.dataTransfer.files.length)
-        validateAndSetFiles(e.dataTransfer.files);
+      if (e.dataTransfer.files.length) validateAndSetFile(e.dataTransfer.files);
     },
-    [validateAndSetFiles],
+    [validateAndSetFile],
   );
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -171,255 +222,219 @@ export default function FileDropzone({
   const handleClick = () => inputRef.current?.click();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) validateAndSetFiles(e.target.files);
+    if (e.target.files?.length) validateAndSetFile(e.target.files);
   };
 
-  const removeFile = (idx: number) => {
-    const updatedPredictions = { ...predictions };
-    delete updatedPredictions[idx];
-    setFiles((f) => f.filter((_, i) => i !== idx));
-    setPreviews((p) => p.filter((_, i) => i !== idx));
-    setPredictions(updatedPredictions);
-    onFilesChange?.(files.filter((_, i) => i !== idx));
+  const removeFile = () => {
+    setFile(null);
+    setPreview(null);
+    setPrediction(null);
+    setPredictedImage(null);
+    onFilesChange?.(null);
     if (inputRef.current) inputRef.current.value = "";
   };
 
-  const formatSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
-  // ─── Render ────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-2xl mx-auto font-[system-ui]">
-      {/* Drop Zone */}
-      <div
-        onClick={handleClick}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        className={[
-          "relative flex flex-col items-center justify-center",
-          "w-full min-h-[280px] rounded-2xl cursor-pointer",
-          "transition-all duration-300 ease-in-out select-none",
-          "border-2 border-dashed",
-          isDragging
-            ? "border-[#8DB887] bg-[#8DB887]/10 scale-[1.01]"
-            : "border-[#A8C5A2] bg-[#EEEFE8] hover:border-[#8DB887] hover:bg-[#8DB887]/5",
-        ].join(" ")}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept={accept}
-          multiple={multiple}
-          onChange={handleChange}
-          className="hidden"
-        />
-
+    <div className="w-full max-w-6xl mx-auto font-[system-ui]">
+      {!file && (
         <div
+          onClick={handleClick}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           className={[
-            "mb-4 transition-transform duration-300",
-            isDragging ? "scale-110 -translate-y-1" : "",
+            "relative flex flex-col items-center justify-center",
+            "w-full min-h-[280px] rounded-2xl cursor-pointer",
+            "transition-all duration-300 ease-in-out select-none",
+            "border-2 border-dashed",
+            isDragging
+              ? "border-[#8DB887] bg-[#8DB887]/10 scale-[1.01]"
+              : "border-[#A8C5A2] bg-[#EEEFE8] hover:border-[#8DB887] hover:bg-[#8DB887]/5",
           ].join(" ")}
         >
-          <Upload className="text-[#3d3d3a]" size={40} />
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            multiple={multiple}
+            onChange={handleChange}
+            className="hidden"
+          />
+
+          <div
+            className={[
+              "mb-4 transition-transform duration-300",
+              isDragging ? "scale-110 -translate-y-1" : "",
+            ].join(" ")}
+          >
+            <Upload className="text-[#3d3d3a]" size={40} />
+          </div>
+
+          <p className="text-[#3d3d3a] text-[15px] font-medium tracking-wide">
+            {isDragging
+              ? "Drop your image here"
+              : "Upload or Drop your image here"}
+          </p>
+          <p className="mt-1.5 text-[#8a8a80] text-[13px]">
+            Max {maxSizeMB} MB · {accept}
+          </p>
+
+          {isDragging && (
+            <div className="absolute inset-2 rounded-xl border-2 border-[#8DB887]/50 pointer-events-none animate-pulse" />
+          )}
         </div>
+      )}
 
-        <p className="text-[#3d3d3a] text-[15px] font-medium tracking-wide">
-          {isDragging
-            ? "Drop your image here"
-            : "Upload or Drop your image here"}
-        </p>
-        <p className="mt-1.5 text-[#8a8a80] text-[13px]">
-          Max {maxSizeMB} MB · {accept}
-        </p>
-
-        {isDragging && (
-          <div className="absolute inset-2 rounded-xl border-2 border-[#8DB887]/50 pointer-events-none animate-pulse" />
-        )}
-      </div>
-
-      {/* Error */}
       {error && (
         <p className="mt-3 text-sm text-red-500 font-medium pl-1">{error}</p>
       )}
 
-      {/* File List */}
-      {files.length > 0 && (
-        <ul className="mt-4 space-y-3">
-          {files.map((file, idx) => (
-            <li
-              key={idx}
-              className="flex flex-col p-4 bg-white rounded-xl border border-[#e0e0d8] shadow-sm"
-            >
-              {/* Header */}
-              <div className="flex items-center gap-3 w-full mb-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13.5px] font-medium text-[#3d3d3a] truncate">
-                    {file.name}
+      {file && (
+        <div className="mt-6">
+          <div className="flex flex-col p-6 bg-white rounded-xl border border-[#e0e0d8] shadow-sm">
+            <div className="flex items-center gap-3 w-full mb-4">
+              <h3 className="flex-1 text-sm font-semibold text-[#3d3d3a]">
+                {file.name}
+              </h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFile();
+                }}
+              >
+                Predict Another Image
+              </Button>
+            </div>
+
+            {/* Before and After Images */}
+            {preview && (
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {/* Before */}
+                <div>
+                  <p className="text-xs text-[#8a8a80] font-medium mb-2">
+                    BEFORE
                   </p>
-                  <p className="text-[12px] text-[#8a8a80]">
-                    {formatSize(file.size)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeFile(idx);
-                  }}
-                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EEEFE8] text-[#aaa] hover:text-red-500 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Preview + Bounding Box */}
-              {previews[idx] && (
-                <div
-                  className="relative w-full rounded-lg overflow-hidden bg-[#EEEFE8]"
-                  style={{ aspectRatio: "1 / 1" }}
-                >
-                  <img
-                    src={previews[idx]}
-                    alt={file.name}
-                    className="w-full h-full object-cover"
-                  />
-
-                  {predictions[idx] &&
-                    (() => {
-                      const box = predictions[idx]!.boundingBox;
-                      const color =
-                        predictions[idx]!.label === "busuk"
-                          ? "#dc2626"
-                          : "#16a34a";
-                      return (
-                        <>
-                          <div
-                            className="absolute pointer-events-none"
-                            style={{
-                              left: `${box.x}%`,
-                              top: `${box.y}%`,
-                              width: `${box.width}%`,
-                              height: `${box.height}%`,
-                              border: `2.5px solid ${color}`,
-                              borderRadius: "6px",
-                              boxShadow: "0 0 0 1px rgba(0,0,0,0.15)",
-                            }}
-                          />
-                          <div
-                            className="absolute pointer-events-none px-2 py-0.5 text-white text-[11px] font-bold rounded"
-                            style={{
-                              left: `${box.x}%`,
-                              top: `calc(${box.y}% - 22px)`,
-                              backgroundColor: color,
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {predictions[idx]!.class} —{" "}
-                            {predictions[idx]!.label}{" "}
-                            {(predictions[idx]!.confidence * 100).toFixed(1)}%
-                          </div>
-                        </>
-                      );
-                    })()}
-
-                  {isPredicting[idx] && (
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="relative w-full rounded-lg bg-[#EEEFE8]">
+                    <div className="relative p-4 w-full h-full grid place-items-center">
+                      <Image
+                        src={preview}
+                        alt={`${file.name} - before`}
+                        className="object-contain"
+                        width={250}
+                        height={250}
+                      />
                     </div>
+
+                    {isPredicting && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs text-[#8a8a80] font-medium mb-2">
+                    AFTER PREDICT
+                  </p>
+                  {isPredicting ? (
+                    <div className="relative w-full rounded-lg overflow-hidden bg-[#EEEFE8] flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-[#8DB887] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  ) : predictedImage ? (
+                    <div className="relative w-full rounded-lg bg-[#EEEFE8]">
+                      <div className="relative p-4 w-full h-full grid place-items-center">
+                        <Image
+                          src={predictedImage}
+                          alt={`${file.name} - after`}
+                          className="object-contain"
+                          width={250}
+                          height={250}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative w-full rounded-lg overflow-hidden bg-[#f7f7f5]" />
                   )}
+                </div>
+              </div>
+            )}
+
+            {!isPredicting &&
+              prediction?.fruits_detected &&
+              prediction.fruits_detected.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-[#e0e0d8]">
+                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
+                          No
+                        </th>
+                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
+                          Class
+                        </th>
+                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
+                          Condition
+                        </th>
+                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
+                          Confidence
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {prediction.fruits_detected.map((detection, detIdx) => {
+                        const confidence =
+                          Math.max(
+                            detection.segar_confidence,
+                            detection.busuk_confidence,
+                          ) * 100;
+                        const isRotten = detection.condition === "busuk";
+
+                        return (
+                          <tr
+                            key={detIdx}
+                            className="border-b border-[#e0e0d8] hover:bg-[#f7f7f5] transition-colors"
+                          >
+                            <td className="py-3 px-3 text-[#3d3d3a] font-medium">
+                              {detIdx + 1}
+                            </td>
+                            <td className="py-3 px-3 text-[#3d3d3a] capitalize">
+                              {detection.class}
+                            </td>
+                            <td className="py-3 px-3">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                                  isRotten
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-green-100 text-green-700"
+                                }`}
+                              >
+                                {detection.condition}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-[#3d3d3a] font-medium">
+                              {confidence.toFixed(1)}%
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
 
-              {/* Hasil Deteksi */}
-              <div className="mt-3 pt-3 border-t border-dashed border-[#e0e0d8]">
-                {isPredicting[idx] ? (
-                  <p className="text-sm text-blue-600 animate-pulse font-medium">
-                    Menganalisis gambar...
-                  </p>
-                ) : predictions[idx] ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-2 text-[13px]">
-                      <div className="bg-[#f7f7f5] p-2 rounded flex justify-between">
-                        <span className="text-[#8a8a80]">Kelas:</span>
-                        <span className="font-semibold capitalize text-[#3d3d3a]">
-                          {predictions[idx]?.class}
-                        </span>
-                      </div>
-                      <div className="bg-[#f7f7f5] p-2 rounded flex justify-between">
-                        <span className="text-[#8a8a80]">Kondisi:</span>
-                        <span
-                          className={`font-semibold capitalize ${predictions[idx]?.label === "busuk" ? "text-red-600" : "text-green-600"}`}
-                        >
-                          {predictions[idx]?.label}
-                        </span>
-                      </div>
-                      <div className="bg-[#f7f7f5] p-2 rounded flex justify-between">
-                        <span className="text-[#8a8a80]">Akurasi:</span>
-                        <span className="font-semibold text-[#3d3d3a]">
-                          {((predictions[idx]?.confidence || 0) * 100).toFixed(
-                            1,
-                          )}
-                          %
-                        </span>
-                      </div>
-                      <div className="bg-[#f7f7f5] p-2 rounded flex justify-between">
-                        <span className="text-[#8a8a80]">Waktu:</span>
-                        <span className="font-semibold text-[#3d3d3a]">
-                          {predictions[idx]?.processing_time_ms.toFixed(0)} ms
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Bar probabilitas */}
-                    <div className="mt-3">
-                      <p className="text-[11px] text-[#8a8a80] mb-1.5 font-medium uppercase tracking-wide">
-                        Semua Probabilitas
-                      </p>
-                      <div className="space-y-1.5">
-                        {predictions[idx]?.allProbabilities.map((p) => {
-                          const isTop =
-                            p.name ===
-                            predictions[idx]!.allProbabilities[0].name;
-                          const color = isTop
-                            ? predictions[idx]!.label === "busuk"
-                              ? "#dc2626"
-                              : "#16a34a"
-                            : "#A8C5A2";
-                          return (
-                            <div
-                              key={p.name}
-                              className="flex items-center gap-2 text-[11px]"
-                            >
-                              <span className="w-28 text-[#3d3d3a] truncate shrink-0">
-                                {p.name}
-                              </span>
-                              <div className="flex-1 bg-[#EEEFE8] rounded-full h-2 overflow-hidden">
-                                <div
-                                  className="h-2 rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${(p.confidence * 100).toFixed(1)}%`,
-                                    backgroundColor: color,
-                                  }}
-                                />
-                              </div>
-                              <span className="w-10 text-right text-[#8a8a80] shrink-0">
-                                {(p.confidence * 100).toFixed(1)}%
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
+            {!isPredicting &&
+              prediction?.fruits_detected &&
+              prediction.fruits_detected.length === 0 && (
+                <div className="p-4 bg-[#f7f7f5] rounded-lg text-center text-[#8a8a80] text-sm">
+                  No fruits detected in this image.
+                </div>
+              )}
+          </div>
+        </div>
       )}
     </div>
   );
