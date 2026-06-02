@@ -80,12 +80,10 @@ export default function FileDropzone({
               const width = xmax - xmin;
               const height = ymax - ymin;
 
-              // Draw rectangle
               ctx.strokeStyle = colors[index % colors.length];
               ctx.lineWidth = 3;
               ctx.strokeRect(xmin, ymin, width, height);
 
-              // Draw label background
               const label = `${detection.class} - ${detection.condition}`;
               const confidence =
                 Math.max(
@@ -99,7 +97,6 @@ export default function FileDropzone({
               const textWidth = ctx.measureText(text).width;
               ctx.fillRect(xmin, ymin - 28, textWidth + 10, 28);
 
-              // Draw text
               ctx.fillStyle = "#FFF";
               ctx.fillText(text, xmin + 5, ymin - 10);
             });
@@ -235,7 +232,7 @@ export default function FileDropzone({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto font-[system-ui]">
+    <div className="w-full max-w-6xl mx-auto p-6">
       {!file && (
         <div
           onClick={handleClick}
@@ -244,7 +241,7 @@ export default function FileDropzone({
           onDragLeave={handleDragLeave}
           className={[
             "relative flex flex-col items-center justify-center",
-            "w-full min-h-[280px] rounded-2xl cursor-pointer",
+            "w-full min-h-66 rounded-2xl cursor-pointer",
             "transition-all duration-300 ease-in-out select-none",
             "border-2 border-dashed",
             isDragging
@@ -290,31 +287,29 @@ export default function FileDropzone({
       )}
 
       {file && (
-        <div className="mt-6">
-          <div className="flex flex-col p-6 bg-white rounded-xl border border-[#e0e0d8] shadow-sm">
+        <div>
+          <div className="flex flex-col p-6 bg-sidebar rounded-xl border shadow-sm">
             <div className="flex items-center gap-3 w-full mb-4">
-              <h3 className="flex-1 text-sm font-semibold text-[#3d3d3a]">
+              <h3 className="flex-1 text-sm font-semibold text-primary/80 line-clamp-1">
                 {file.name}
               </h3>
               <Button
                 type="button"
-                variant="outline"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile();
                 }}
+                className="text-background bg-accent hover:bg-accent/80 rounded-sm cursor-pointer"
               >
                 Predict Another Image
               </Button>
             </div>
 
-            {/* Before and After Images */}
             {preview && (
               <div className="grid grid-cols-2 gap-4 mb-6">
-                {/* Before */}
                 <div>
-                  <p className="text-xs text-[#8a8a80] font-medium mb-2">
+                  <p className="text-xs text-primary/80 font-medium mb-2">
                     BEFORE
                   </p>
                   <div className="relative w-full rounded-lg bg-[#EEEFE8]">
@@ -329,7 +324,7 @@ export default function FileDropzone({
                     </div>
 
                     {isPredicting && (
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-primary/30 flex items-center justify-center">
                         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
                       </div>
                     )}
@@ -337,11 +332,11 @@ export default function FileDropzone({
                 </div>
 
                 <div>
-                  <p className="text-xs text-[#8a8a80] font-medium mb-2">
+                  <p className="text-xs text-primary/80 font-medium mb-2">
                     AFTER PREDICT
                   </p>
                   {isPredicting ? (
-                    <div className="relative w-full rounded-lg overflow-hidden bg-[#EEEFE8] flex items-center justify-center">
+                    <div className="relative w-full h-full rounded-lg overflow-hidden bg-[#EEEFE8] flex items-center justify-center">
                       <div className="w-8 h-8 border-4 border-[#8DB887] border-t-transparent rounded-full animate-spin" />
                     </div>
                   ) : predictedImage ? (
