@@ -104,7 +104,6 @@ const Home = () => {
                         width={100}
                         height={100}
                         style={i.style}
-                        sizes="250px"
                       />
                     ))}
                 </div>
@@ -123,7 +122,7 @@ const Home = () => {
       </section>
       <section className="mt-12 h-[80svh]">
         <div className="relative py-12 px-4 md:px-0 md:py-16 h-full flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 -z-10 blur-lg bg-[url(/images/bg-1.jpg)] bg-cover bg-top brightness-80" />
+          <div className="absolute inset-0 -z-10 blur bg-[url(/images/bg-4.jpg)] bg-cover bg-top brightness-85" />
           <div className="flex items-center justify-center flex-col gap-y-3 w-full md:max-w-2/3 text-background">
             <h1 className="text-4xl md:text-6xl font-medium text-center">
               Know your fruit before you eat it
@@ -145,7 +144,6 @@ const Home = () => {
                   alt="Get Started"
                   width={32}
                   height={32}
-                  sizes=""
                 />
               </span>
             </Button>

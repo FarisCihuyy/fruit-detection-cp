@@ -45,8 +45,6 @@ export const fruitGrid: Fruit[] = [
         src: "/icons/apple.png",
         style: {
           position: "absolute",
-          width: "100px",
-          height: "auto",
           top: "-80%",
           left: "10%",
           zIndex: -1,
@@ -58,8 +56,6 @@ export const fruitGrid: Fruit[] = [
         src: "/icons/banana.png",
         style: {
           position: "absolute",
-          width: "6.25rem",
-          height: "auto",
           bottom: "-60%",
           right: "10%",
           zIndex: -1,
@@ -105,8 +101,6 @@ export const fruitGrid: Fruit[] = [
         src: "/icons/orange.png",
         style: {
           position: "absolute",
-          width: "6.25rem",
-          height: "auto",
           top: "-80%",
           left: "10%",
           zIndex: -1,
@@ -118,8 +112,6 @@ export const fruitGrid: Fruit[] = [
         src: "/icons/dragon-fruit.png",
         style: {
           position: "absolute",
-          width: "100px",
-          height: "auto",
           bottom: "-60%",
           right: "10%",
           zIndex: -1,

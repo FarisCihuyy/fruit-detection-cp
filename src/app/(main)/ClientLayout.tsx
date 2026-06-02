@@ -21,10 +21,21 @@ const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   });
 
   return (
-    <main id="scroll-wrapper">
-      <Navabar />
-      <div id="scroll-content">{children}</div>
-    </main>
+    <>
+      <main id="scroll-wrapper">
+        <Navabar />
+        <div id="scroll-content">
+          {children}
+          <footer className="h-screen bg-[url('/images/bg-footer.png')] bg-cover flex items-end ">
+            <h1 className="select-none p-6 text-secondary/50 w-full text-[19cqw] flex flex-col *:leading-none font-sourceSerif">
+              <span>Fresh</span>
+              <span className="text-[8cqw] text-center">or</span>
+              <span className="text-right">Trash</span>
+            </h1>
+          </footer>
+        </div>
+      </main>
+    </>
   );
 };
 
