@@ -17,10 +17,14 @@ import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/loading-context";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
-import MarkdownEditor from "@/components/MarkdownEditor";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import Image from "next/image";
 import { Upload } from "lucide-react";
+
+const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), {
+  ssr: false,
+});
 
 const schema = z.object({
   title: z
