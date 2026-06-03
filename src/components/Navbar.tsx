@@ -60,7 +60,7 @@ const Navabar = () => {
     <div className="fixed top-0 left-0 z-50 w-full flex justify-center md:py-4 md:px-6">
       <div
         ref={navbarRef}
-        className={clsx("w-full h-full", {
+        className={clsx("w-full h-full min-w-lg", {
           "bg-background/70 backdrop-blur-[150px] shadow": scrolled,
         })}
       >

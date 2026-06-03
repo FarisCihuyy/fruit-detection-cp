@@ -26,12 +26,17 @@ const ClientLayout = ({ children }: { children: React.ReactNode }) => {
         <Navabar />
         <div id="scroll-content">
           {children}
-          <footer className="h-screen bg-[url('/images/bg-footer.png')] bg-cover flex items-end ">
-            <h1 className="select-none p-6 text-secondary/50 w-full text-[19cqw] flex flex-col *:leading-none font-sourceSerif">
+          <footer className="relative md:min-h-[80vh] lg:h-screen bg-[url('/images/bg-footer.png')] bg-cover">
+            <h1 className="select-none p-6 text-secondary/50 w-full md:text-[30cqw] lg:text-[19cqw] flex flex-col *:leading-none font-sourceSerif">
               <span>Fresh</span>
-              <span className="text-[8cqw] text-center">or</span>
-              <span className="text-right">Trash</span>
+              <span className="md:text-12cqw xl:text-[8cqw] lg:text-center">
+                or
+              </span>
+              <span className="lg:text-right">Trash</span>
             </h1>
+            <h3 className="absolute left-1/2 -translate-x-1/2 md:translate-x-0 md:left-4 bottom-4 font-sourceSerif font-light text-lg">
+              &copy; CodingCamp2026 | CC26-PSU044.
+            </h3>
           </footer>
         </div>
       </main>
