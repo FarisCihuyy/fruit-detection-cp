@@ -166,7 +166,8 @@ export function ArticleForm({
         <Controller
           name="thumbnail"
           control={form.control}
-          render={({ _, fieldState }) => (
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          render={({ a, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="thumbnail">Thumbnail (PNG/JPG)</FieldLabel>
 
