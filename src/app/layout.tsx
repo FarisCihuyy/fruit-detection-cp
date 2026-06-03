@@ -27,6 +27,9 @@ const archivo = Archivo({
 export const metadata: Metadata = {
   title: "Fresh or Trash",
   description: "Fruit classifier",
+  icons: {
+    icon: "/icons/logo.svg",
+  },
 };
 
 export default function RootLayout({

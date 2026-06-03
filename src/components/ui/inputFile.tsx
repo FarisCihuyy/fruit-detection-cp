@@ -54,7 +54,6 @@ export default function FileDropzone({
 
         img.onload = () => {
           try {
-            // Create a new canvas element
             const canvas = document.createElement("canvas");
             canvas.width = img.width;
             canvas.height = img.height;
@@ -65,10 +64,8 @@ export default function FileDropzone({
               return;
             }
 
-            // Draw the image
             ctx.drawImage(img, 0, 0);
 
-            // Draw bounding boxes
             const colors = [
               "#FF6B6B",
               "#4ECDC4",
@@ -290,26 +287,26 @@ export default function FileDropzone({
 
       {file && (
         <div>
-          <div className="flex flex-col p-6 bg-sidebar rounded-xl border shadow-sm">
+          <div className="flex flex-col p-4 bg-sidebar rounded border shadow">
             <div className="flex items-center gap-3 w-full mb-4">
               <h3 className="flex-1 text-sm font-semibold text-primary/80 line-clamp-1">
                 {file.name}
               </h3>
               <Button
                 type="button"
-                size="sm"
+                size="xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile();
                 }}
-                className="text-background bg-accent hover:bg-accent/80 rounded-sm cursor-pointer"
+                className=" text-background bg-accent hover:bg-accent/80 rounded-sm cursor-pointer"
               >
                 Predict Another Image
               </Button>
             </div>
 
             {preview && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-primary/80 font-light uppercase mb-2">
                     Original Image
