@@ -1,4 +1,4 @@
-import { House } from "lucide-react";
+import { Files, House } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,11 @@ export function AppSidebar() {
       label: "Home",
       icon: House,
       href: "/playground",
+    },
+    {
+      label: "Articles",
+      icon: Files,
+      href: "/playground/articles",
     },
   ];
 

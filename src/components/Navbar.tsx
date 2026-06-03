@@ -161,7 +161,7 @@ const Navabar = () => {
               className="transition-colors hover:text-accent hover:underline hover:font-medium"
               onClick={() => setIsOpen(false)}
             >
-              Try now!
+              {user ? "Playground" : "Try now!"}
             </Link>
           </div>
         </nav>

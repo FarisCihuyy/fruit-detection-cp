@@ -15,7 +15,7 @@ const PlaygroundLayout = ({ children }: { children: React.ReactNode }) => {
       <AppSidebar />
       <main className="w-full">
         <header className="min-h-12 px-6 xl:min-h-16 flex items-center justify-between gap-x-4 bg-sidebar border-b">
-          <SidebarTrigger />
+          <SidebarTrigger className="hover:bg-accent/5 rounded -ml-4 hover:text-accent" />
           <UserProfile />
         </header>
         {children}
