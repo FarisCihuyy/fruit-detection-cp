@@ -4,11 +4,13 @@ import { Upload } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { Button } from "./button";
+import { DataTable } from "../DataTable";
+import { columns } from "@/data/predict-columns";
 
 interface FruitDetection {
   id: number;
   class: string;
-  condition: string;
+  condition: "busuk" | "segar";
   segar_confidence: number;
   busuk_confidence: number;
   box: [number, number, number, number];
@@ -232,7 +234,7 @@ export default function FileDropzone({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
+    <div className="w-full max-w-6xl mx-auto p-6 space-y-4">
       {!file && (
         <div
           onClick={handleClick}
@@ -307,10 +309,10 @@ export default function FileDropzone({
             </div>
 
             {preview && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-primary/80 font-medium mb-2">
-                    BEFORE
+                  <p className="text-xs text-primary/80 font-light uppercase mb-2">
+                    Original Image
                   </p>
                   <div className="relative w-full rounded-lg bg-[#EEEFE8]">
                     <div className="relative p-4 w-full h-full grid place-items-center">
@@ -332,8 +334,8 @@ export default function FileDropzone({
                 </div>
 
                 <div>
-                  <p className="text-xs text-primary/80 font-medium mb-2">
-                    AFTER PREDICT
+                  <p className="text-xs text-primary/80 font-light uppercase mb-2">
+                    Results
                   </p>
                   {isPredicting ? (
                     <div className="relative w-full h-full rounded-lg overflow-hidden bg-[#EEEFE8] flex items-center justify-center">
@@ -357,80 +359,17 @@ export default function FileDropzone({
                 </div>
               </div>
             )}
-
-            {!isPredicting &&
-              prediction?.fruits_detected &&
-              prediction.fruits_detected.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse">
-                    <thead>
-                      <tr className="border-b-2 border-[#e0e0d8]">
-                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
-                          No
-                        </th>
-                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
-                          Class
-                        </th>
-                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
-                          Condition
-                        </th>
-                        <th className="text-left py-3 px-3 text-[#8a8a80] font-semibold">
-                          Confidence
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {prediction.fruits_detected.map((detection, detIdx) => {
-                        const confidence =
-                          Math.max(
-                            detection.segar_confidence,
-                            detection.busuk_confidence,
-                          ) * 100;
-                        const isRotten = detection.condition === "busuk";
-
-                        return (
-                          <tr
-                            key={detIdx}
-                            className="border-b border-[#e0e0d8] hover:bg-[#f7f7f5] transition-colors"
-                          >
-                            <td className="py-3 px-3 text-[#3d3d3a] font-medium">
-                              {detIdx + 1}
-                            </td>
-                            <td className="py-3 px-3 text-[#3d3d3a] capitalize">
-                              {detection.class}
-                            </td>
-                            <td className="py-3 px-3">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
-                                  isRotten
-                                    ? "bg-red-100 text-red-700"
-                                    : "bg-green-100 text-green-700"
-                                }`}
-                              >
-                                {detection.condition}
-                              </span>
-                            </td>
-                            <td className="py-3 px-3 text-[#3d3d3a] font-medium">
-                              {confidence.toFixed(1)}%
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-            {!isPredicting &&
-              prediction?.fruits_detected &&
-              prediction.fruits_detected.length === 0 && (
-                <div className="p-4 bg-[#f7f7f5] rounded-lg text-center text-[#8a8a80] text-sm">
-                  No fruits detected in this image.
-                </div>
-              )}
           </div>
         </div>
       )}
+      {!isPredicting &&
+        prediction?.fruits_detected &&
+        prediction.fruits_detected.length > 0 && (
+          <div className="container mx-auto space-y-2 bg-sidebar shadow p-4 rounded">
+            <h2 className="text-xs font-light uppercase">Table of results</h2>
+            <DataTable columns={columns} data={prediction.fruits_detected} />
+          </div>
+        )}
     </div>
   );
 }

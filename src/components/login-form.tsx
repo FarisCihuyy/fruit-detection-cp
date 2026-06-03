@@ -63,7 +63,7 @@ export function LoginForm({
         },
       });
 
-      router.back();
+      router.push("/playground");
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message ?? "Login failed", {

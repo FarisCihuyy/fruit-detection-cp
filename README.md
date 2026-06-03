@@ -21,11 +21,11 @@ Before you begin, ensure you have the following installed on your machine:
 
 ## Setup & Installation
 
-1. **Clone the repository** (if you haven't already):
+1. **Clone the repository**:
 
    ```bash
-   git clone <your-repository-url>
-   cd fresh-fruit
+   git clone https://github.com/FarisCihuyy/fruit-detection-cp.git
+   cd fruit-detection-cp
    ```
 
 2. **Install dependencies**:

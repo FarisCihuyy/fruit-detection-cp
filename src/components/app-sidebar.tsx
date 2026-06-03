@@ -1,4 +1,4 @@
-import { LayoutPanelLeft, Upload, Camera } from "lucide-react";
+import { House } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,19 +13,9 @@ import Link from "next/link";
 export function AppSidebar() {
   const menuItems = [
     {
-      label: "Dashboard",
-      icon: LayoutPanelLeft,
+      label: "Home",
+      icon: House,
       href: "/playground",
-    },
-    {
-      label: "Upload",
-      icon: Upload,
-      href: "/playground/upload",
-    },
-    {
-      label: "Live Camera",
-      icon: Camera,
-      href: "/playground/live-camera",
     },
   ];
 

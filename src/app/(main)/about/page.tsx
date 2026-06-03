@@ -60,6 +60,7 @@ const About = () => {
       role: "Artificial Intelligence",
       university: "Bina Nusantara University",
       linkedin: "https://www.linkedin.com/in/tristan-nafi-agung-kurniawan/",
+      email: "tristan.nafiak2712@gmail.com",
     },
     {
       name: "Marcellus Geraldio Florenta",
@@ -72,7 +73,7 @@ const About = () => {
       name: "Nisa Jamalia Hanif",
       role: "Data Science",
       university: "Bina Nusantara University",
-      linkedin: null,
+      linkedin: "https://www.linkedin.com/in/nisa-jamalia-hanif-83a491170",
     },
     {
       name: "Akmal Hendrian Malik",
