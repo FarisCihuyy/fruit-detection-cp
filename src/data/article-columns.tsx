@@ -17,6 +17,13 @@ export const columns: ColumnDef<Articles["data"]>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      return (
+        <div className="max-w-155 overflow-hidden text-ellipsis whitespace-nowrap">
+          {row.original.description}
+        </div>
+      );
+    },
   },
   {
     id: "view",

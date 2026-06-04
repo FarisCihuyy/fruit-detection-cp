@@ -5,6 +5,9 @@ export const article = {
     const response = await apiClient.get("/articles");
     return response;
   },
+  async getByAuthorId(id: string) {
+    return await apiClient.get(`/articles/author/${id}`);
+  },
   async getById(id: string) {
     const response = await apiClient.get(`/articles/${id}`);
     return response;

@@ -18,6 +18,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useLoading } from "@/context/loading-context";
+import { useState } from "react";
+import { Eye, EyeClosed } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(3, "Please enter your name, at least 3 characters."),
@@ -37,6 +39,7 @@ export function RegisterForm({
 }: React.ComponentProps<"form">) {
   const router = useRouter();
   const { setLoading } = useLoading();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
@@ -136,16 +139,22 @@ export function RegisterForm({
           name="password"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
+            <Field data-invalid={fieldState.invalid} className="relative">
               <FieldLabel htmlFor="password">Password</FieldLabel>
 
               <Input
                 {...field}
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="********"
                 aria-invalid={fieldState.invalid}
               />
+              <div
+                className="absolute top-10 right-2 max-w-fit *:size-4"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <Eye /> : <EyeClosed />}
+              </div>
 
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
