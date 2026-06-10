@@ -67,6 +67,7 @@ const About = () => {
       name: "Marcellus Geraldio Florenta",
       role: "Artificial Intelligence",
       university: "Bina Nusantara University",
+      image: "/images/dio.jpg",
       linkedin:
         "https://www.linkedin.com/in/marcellus-geraldio-florenta-75578b292/",
     },
