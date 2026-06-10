@@ -15,16 +15,16 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
+    if (!user?.id) return;
+
     const getArticles = async () => {
       const response = await article.getByAuthorId(user?.id as string);
 
       setArticles(response.data);
     };
 
-    if (user) {
-      getArticles();
-    }
-  }, []);
+    getArticles();
+  }, [user?.id]);
 
   return (
     <div className="flex flex-col gap-y-4">

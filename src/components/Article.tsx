@@ -16,7 +16,7 @@ const Article = ({ data }: { data: Articles["data"] }) => {
       <h2 className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2">
         {formatDate(data.createdAt) ?? "-"}
       </h2>
-      <div className="flex flex-col sm:flex-row gap-x-4 gap-y-4 sm:gap-y-0 md:gap-x-12 items-center *:flex-1 w-full md:max-w-3/5">
+      <div className="flex flex-col sm:flex-row gap-x-4 gap-y-4 sm:gap-y-0 md:gap-x-12 md:items-center *:flex-1 w-full md:max-w-3/5">
         <div className="relative overflow-hidden w-full border min-h-66">
           <Image
             src={data.thumbnail ?? "/images/blog-placeholder.jpg"}

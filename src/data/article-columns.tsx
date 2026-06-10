@@ -8,33 +8,40 @@ export const columns: ColumnDef<Articles["data"]>[] = [
   {
     id: "no",
     header: "No.",
-    cell: ({ row }) => row.index + 1,
+    size: 60,
+    cell: ({ row }) => <div className="w-[60px]">{row.index + 1}</div>,
   },
   {
     accessorKey: "title",
     header: "Title",
+    size: 300,
+    cell: ({ row }) => (
+      <p className="max-w-[270px] truncate">{row.original.title}</p>
+    ),
   },
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ row }) => {
-      return (
-        <div className="max-w-155 overflow-hidden text-ellipsis whitespace-nowrap">
-          {row.original.description}
-        </div>
-      );
-    },
+    size: 500,
+    cell: ({ row }) => (
+      <p className="max-w-[500px] truncate" title={row.original.description}>
+        {row.original.description}
+      </p>
+    ),
   },
   {
     id: "view",
     header: "View",
+    size: 100,
     cell: ({ row }) => (
       <a
         href={`/blog/${row.original.id}/${row.original.slug}`}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
-          "font-medium border rounded-sm px-2 py-1",
+          "inline-flex items-center",
+          "rounded-sm border px-2 py-1",
+          "font-medium",
           "text-blue-500 border-blue-500/50 bg-blue-500/10",
         )}
       >

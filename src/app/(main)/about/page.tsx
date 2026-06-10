@@ -59,6 +59,7 @@ const About = () => {
       name: "Tristan Nafi Agung Kurniawan",
       role: "Artificial Intelligence",
       university: "Bina Nusantara University",
+      image: "/images/tristan.jpg",
       linkedin: "https://www.linkedin.com/in/tristan-nafi-agung-kurniawan/",
       email: "tristan.nafiak2712@gmail.com",
     },
@@ -84,6 +85,7 @@ const About = () => {
     {
       name: "Muh.Amar ma'ruf",
       role: "Fullstack Developer",
+      image: "/images/amar.jpg",
       university: "Universitas Ichsan Sidenreng Rappang",
       linkedin: "https://www.linkedin.com/in/muh-amar-ma-ruf/",
     },
@@ -209,7 +211,7 @@ const About = () => {
                   alt={team.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
                 />
               </div>
               <div className="space-y-1 p-2">

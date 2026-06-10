@@ -39,8 +39,8 @@ const Home = () => {
   });
 
   return (
-    <div className="pt-8 bg-[url('/images/hero_1.png')] bg-no-repeat bg-size-[clamp(1260px,120vw,3000px)_auto] bg-position-[top_50px_right_-450px]">
-      <section className="relative flex flex-col justify-between items-start gap-20 min-h-[80vh] md:min-h-screen py-12 px-3 md:px-6">
+    <div className="pt-8 bg-[url('/images/hero.webp')] bg-no-repeat bg-size-[clamp(1260px,120vw,3000px)_auto] bg-position-[top_50px_right_-450px]">
+      <section className="relative flex flex-col justify-between items-start gap-20 min-h-[80vh] md:min-h-190 py-12 px-3 md:px-6">
         <div className="absolute top-52 left-[10%] size-54 overflow-hidden rotate-65 -z-10">
           <Image src="/images/leaft.png" alt="leaft" fill sizes="220px" />
         </div>
